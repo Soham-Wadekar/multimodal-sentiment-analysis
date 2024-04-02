@@ -1,0 +1,19 @@
+# Text files
+*.txt
+
+# Image files
+*.jpg
+*.png
+
+# Audio files
+*.wav
+*.mp3
+
+# Video files
+*.mp4
+
+# Cache
+__pycache__
+
+# Environment files
+.env
