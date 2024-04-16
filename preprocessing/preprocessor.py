@@ -1,15 +1,54 @@
 import os
 from dotenv import load_dotenv, find_dotenv
-from utils.text_utils import *
+
+load_dotenv(find_dotenv())
 
 # For text preprocessing
 import re
+from utils.text_utils import *
+
+# For audio preprocessing
+import librosa
+import pandas as pd
+import numpy as np
+from utils.audio_utils import *
 
 extracted_file_path = os.environ.get("EXTRACTED_FILE_PATH")
 preprocessed_file_path = os.environ.get("PREPROCESSING_FILE_PATH")
 
-def preprocess_audio():
-    ...
+def preprocess_audio(input_path):
+    
+    features, labels = [], []
+
+    for filename in os.listdir(input_path):
+        
+        sentiment = filename[6:8]
+        if sentiment in ['04', '05', '07']:
+            labels.append(-1)
+        elif sentiment in ['01']:
+            labels.append(0)
+        elif sentiment in ['02', '03', '08']:
+            labels.append(1)
+
+        y, sr = librosa.load(os.path.join(input_path, filename), sr=16000)
+        y_normalized = librosa.util.normalize(y)
+        mfccs = librosa.feature.mfcc(y=y_normalized, sr=sr, n_mfcc=13)
+        mfccs_scaled = (mfccs - np.mean(mfccs, axis=0)) / np.std(mfccs, axis=0)
+        mfccs_flattened = mfccs_scaled.flatten()
+
+        features.append(mfccs_flattened)
+
+    data = pd.DataFrame({
+        'Name': filename,
+        'Features': features,
+        'Label': labels
+    })
+
+    max_len = data["Features"].apply(len).max()
+    data['Features'] = data['Features'].apply(lambda x: pad_array(x, max_len))
+
+    return data
+
 
 def preprocess_videoframes():
     ...
