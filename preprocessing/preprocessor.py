@@ -22,6 +22,7 @@ def preprocess_audio(input_path):
 
     for filename in os.listdir(input_path):
         
+        # Adding labels
         sentiment = filename[6:8]
         if sentiment in ['04', '05', '07']:
             labels.append(-1)
@@ -30,20 +31,31 @@ def preprocess_audio(input_path):
         elif sentiment in ['02', '03', '08']:
             labels.append(1)
 
+        # Load the data
         y, sr = librosa.load(os.path.join(input_path, filename), sr=16000)
+
+        # Normalizing the audio file
         y_normalized = librosa.util.normalize(y)
+
+        # Extracting Mel Frequency Cepstral Coeffients (MFCCs)
         mfccs = librosa.feature.mfcc(y=y_normalized, sr=sr, n_mfcc=13)
+
+        # Scaling the MFCCs
         mfccs_scaled = (mfccs - np.mean(mfccs, axis=0)) / np.std(mfccs, axis=0)
+
+        # Making the 2D array into 1D
         mfccs_flattened = mfccs_scaled.flatten()
 
         features.append(mfccs_flattened)
 
+    # Creating the data
     data = pd.DataFrame({
         'Name': filename,
         'Features': features,
         'Label': labels
     })
 
+    # Padding all the data points for uniformity
     max_len = data["Features"].apply(len).max()
     data['Features'] = data['Features'].apply(lambda x: pad_array(x, max_len))
 
