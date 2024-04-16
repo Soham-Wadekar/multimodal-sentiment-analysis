@@ -12,6 +12,9 @@
 # Video files
 *.mp4
 
+# Data Files
+*.csv
+
 # Cache
 __pycache__
 
@@ -20,4 +23,3 @@ __pycache__
 
 # Hidden folders
 utils/
-models/
