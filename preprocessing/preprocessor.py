@@ -59,6 +59,8 @@ def preprocess_audio(input_path):
     max_len = data["Features"].apply(len).max()
     data['Features'] = data['Features'].apply(lambda x: pad_array(x, max_len))
 
+    data['Features'] = data['Features'].apply(lambda x: np.reshape(x, (165, 13)))
+
     return data
 
 
