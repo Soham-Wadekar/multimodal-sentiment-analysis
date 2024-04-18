@@ -3,15 +3,15 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
-# For text preprocessing
-import re
-from utils.text_utils import *
-
 # For audio preprocessing
 import librosa
 import pandas as pd
 import numpy as np
 from utils.audio_utils import *
+
+# For text preprocessing
+import re
+from utils.text_utils import *
 
 extracted_file_path = os.environ.get("EXTRACTED_FILE_PATH")
 preprocessed_file_path = os.environ.get("PREPROCESSING_FILE_PATH")
@@ -62,10 +62,6 @@ def preprocess_audio(input_path):
     data['Features'] = data['Features'].apply(lambda x: np.reshape(x, (165, 13)))
 
     return data
-
-
-def preprocess_videoframes():
-    ...
 
 def preprocess_text(text):
 
