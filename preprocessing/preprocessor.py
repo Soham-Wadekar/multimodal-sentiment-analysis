@@ -22,31 +22,32 @@ def preprocess_audio(input_path):
 
     for filename in os.listdir(input_path):
         
-        # Adding labels
-        sentiment = filename[6:8]
-        if sentiment in ['04', '05', '07']:
-            labels.append(-1)
-        elif sentiment in ['01']:
-            labels.append(0)
-        elif sentiment in ['02', '03', '08']:
-            labels.append(1)
+        if filename[-3:] == 'wav':
+            # Adding labels
+            sentiment = filename[6:8]
+            if sentiment in ['04', '05', '07']:
+                labels.append(-1)
+            elif sentiment in ['01']:
+                labels.append(0)
+            elif sentiment in ['02', '03', '08']:
+                labels.append(1)
 
-        # Load the data
-        y, sr = librosa.load(os.path.join(input_path, filename), sr=16000)
+            # Load the data
+            y, sr = librosa.load(os.path.join(input_path, filename), sr=16000)
 
-        # Normalizing the audio file
-        y_normalized = librosa.util.normalize(y)
+            # Normalizing the audio file
+            y_normalized = librosa.util.normalize(y)
 
-        # Extracting Mel Frequency Cepstral Coeffients (MFCCs)
-        mfccs = librosa.feature.mfcc(y=y_normalized, sr=sr, n_mfcc=13)
+            # Extracting Mel Frequency Cepstral Coeffients (MFCCs)
+            mfccs = librosa.feature.mfcc(y=y_normalized, sr=sr, n_mfcc=13)
 
-        # Scaling the MFCCs
-        mfccs_scaled = (mfccs - np.mean(mfccs, axis=0)) / np.std(mfccs, axis=0)
+            # Scaling the MFCCs
+            mfccs_scaled = (mfccs - np.mean(mfccs, axis=0)) / np.std(mfccs, axis=0)
 
-        # Making the 2D array into 1D
-        mfccs_flattened = mfccs_scaled.flatten()
+            # Making the 2D array into 1D
+            mfccs_flattened = mfccs_scaled.flatten()
 
-        features.append(mfccs_flattened)
+            features.append(mfccs_flattened)
 
     # Creating the data
     data = pd.DataFrame({
@@ -62,6 +63,24 @@ def preprocess_audio(input_path):
     data['Features'] = data['Features'].apply(lambda x: np.reshape(x, (165, 13)))
 
     return data
+
+def preprocess_audiofile(audio_file_path):
+    # Load the data
+    y, sr = librosa.load(audio_file_path, sr=16000)
+
+    # Normalizing the audio file
+    y_normalized = librosa.util.normalize(y)
+
+    # Extracting Mel Frequency Cepstral Coeffients (MFCCs)
+    mfccs = librosa.feature.mfcc(y=y_normalized, sr=sr, n_mfcc=13)
+
+    # Scaling the MFCCs
+    mfccs_scaled = (mfccs - np.mean(mfccs, axis=0)) / np.std(mfccs, axis=0)
+
+    # Making the 2D array into 1D
+    mfccs_flattened = mfccs_scaled.flatten()
+
+    return mfccs_flattened
 
 def preprocess_text(text):
 
